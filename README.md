@@ -1,2 +1,2 @@
 # dogFactsBlog
-A CMS style blog site for blogging dog facts
+A CMS (Content Management System) style blog site for blogging dog facts
