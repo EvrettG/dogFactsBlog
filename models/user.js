@@ -9,7 +9,7 @@ class User extends model {
         return bcrypt.compareSync(loginPw, this.password);
       }
 }
-// set's table to include id, User title, User content and refeence it to a user via user_id foriegn key
+// set's table to include id, Username, User password and user email
 User.init(
     {
         id: {
@@ -22,6 +22,14 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
+            },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true,
+                },
             },
         password: {
             type: DataTypes.STRING,
