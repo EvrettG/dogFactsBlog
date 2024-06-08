@@ -24,7 +24,7 @@ Comments.init(
                 key: 'id',
             },
             },
-        Comments_date: {
+            created_at: {
             type: DataTypes.DATE,
             allowNull: false,
             },

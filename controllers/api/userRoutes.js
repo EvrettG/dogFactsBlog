@@ -3,6 +3,15 @@ const { User } = require('../../models');
 
 // CREATE new user
 router.post('/', async (req, res) => {
+    if(!req.body.username){
+      return res.status(400).json({ message: 'User name is required' });
+    }
+    if (!req.body.email){
+      return res.status(400).json({ message: 'email is required' });
+    }
+    if (!req.body.password || !req.body.password.length >= 6){
+      return res.status(400).json({ message: 'Password is not valid' });
+    }
     try {
       const userData = await User.create({
         username: req.body.username,

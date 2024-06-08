@@ -17,14 +17,14 @@ Post.init(
             type: DataTypes.STRING,
             allowNull: false
             },
-        post_content: {
+        post_text: {
             type: DataTypes.STRING,
             allowNull: false,
             },
-        poste_date: {
+        created_at: {
             type: DataTypes.DATE,
             allowNull: false,
-        },
+            },
         user_id: {
             type: DataTypes.INTEGER,
             references: {
