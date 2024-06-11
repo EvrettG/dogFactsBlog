@@ -10,15 +10,15 @@ Post.belongsTo(User, {
     foreignKey: 'user_id',
 });
 
-Comment.belongsTo(User, {
+Comments.belongsTo(User, {
 foreignKey: 'user_id'
 });
 
-Comment.belongsTo(Post, {
+Comments.belongsTo(Post, {
 foreignKey: 'post_id'
 });
 
-Post.hasMany(Comment, {
+Post.hasMany(Comments, {
 foreignKey: 'post_id',
 onDelete: 'CASCADE'
 });
