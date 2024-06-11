@@ -4,25 +4,25 @@ const postData = [
     {
     post_title: 'Test',
     post_text: 'First test post',
-    created_at: "2024-06-07T09:15:06.000Z",
+    date_time: "2024-06-07T09:15:06.000Z",
     user_id: 1,
     },
     {
     post_title: 'Dog Fact 1',
     post_text: 'Dogs are cool',
-    created_at: "2024-06-08T09:12:55.000Z",
+    date_time: "2024-06-08T09:12:55.000Z",
     user_id: 2,
     },
     {
     post_title: 'Dog Fact 2',
     post_text: 'Dogs should not eat spidders',
-    created_at: "2024-06-09T09:08:16.000Z",
+    date_time: "2024-06-09T09:08:16.000Z",
     user_id: 2,
     },
     {
     post_title: 'Needs more dogs',
     post_text: 'Dog facts needs more dogs stat',
-    created_at: "2024-06-09T09:18:36.000Z",
+    date_time: "2024-06-09T09:18:36.000Z",
     user_id: 3,
     },
   ];

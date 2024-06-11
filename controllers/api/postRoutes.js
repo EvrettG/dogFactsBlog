@@ -16,7 +16,6 @@ router.post('/', withAuth, async (req, res) => {
         const postdata = await Post.create({
             post_title: title,
             post_text: post_text,
-            created_at: created_at,
             user_id: req.session.user_id
         });
 

@@ -1,18 +1,38 @@
 const router = require('express').Router();
-const { User } = require('../models');
+const { User, Post } = require('../models');
 const withAuth = require('../utils/auth');
 
-router.get('/', withAuth, async (req, res) => {
+// This loads the homepage.hadlebars with selected data
+router.get('/', async (req, res) => {
   try {
-    const userData = await User.findAll({
-      attributes: { exclude: ['password'] },
-      order: [['name', 'ASC']],
+    const userData = await Post.findAll({
+      attributes: [
+        'id',
+        'title',
+        "post_text",
+        'created_at'      
+      ],
+      order: [['created_at', 'ASC']],
+      include: [
+        {
+          model: Comment,
+          attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+          include: {
+            model: User,
+            attributes: ['username']
+          }
+        },
+        {
+          model: User,
+          attributes: ['username']
+        }
+      ]
     });
 
-    const users = userData.map((project) => project.get({ plain: true }));
+    const posts = userData.map((project) => project.get({ plain: true }));
 
     res.render('homepage', {
-      users,
+      posts,
       logged_in: req.session.logged_in,
     });
   } catch (err) {
@@ -25,7 +45,6 @@ router.get('/login', (req, res) => {
     res.redirect('/');
     return;
   }
-
   res.render('login');
 });
 

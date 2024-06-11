@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         });
         const comments = commentsdata.map(comments => comments.get({ plain: true }));
 
-        res.render('comments', { comments });
+        res.json(comments);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
@@ -33,7 +33,6 @@ router.post('/', withAuth, async (req, res) => {
         const commentdata = await Comments.create({
             post_id: post_id,
             comments_text: comments_text,
-            created_at: created_at,
             user_id: req.session.user_id
         });
 
