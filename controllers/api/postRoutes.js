@@ -1,41 +1,32 @@
 const router = require('express').Router();
 const withAuth = require('../../utils/auth');
-const { Post, Comments } = require('../../models');
+const { Post, Comments, User } = require('../../models');
 
-// Create a new Post
-router.post('/', withAuth, async (req, res) => {
-    try {
-        // Checks usser is logged in
-        if (!req.session.user_id) {
-            return res.status(401).json({ message: 'User not authenticated' });
-        }
-        // Extracting the necessary data from the request body
-        const { title, post_text, created_at } = req.body;
-        
-        // Create a new post using the Post model
-        const postdata = await Post.create({
-            post_title: title,
-            post_text: post_text,
-            user_id: req.session.user_id
-        });
-
-        // Respond with the created post data
-        return res.status(200).json(postdata);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
-});
-
-// Get all Posts and render homepage
+// Get all Posts
 router.get('/', async (req, res) => {
     try {
         const postdata = await Post.findAll({
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
+            include: [
+                {
+                  model: User,
+                  attributes: ['username']
+                },
+                {
+                  model: Comment,
+                  attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                  include: {
+                    model: User,
+                    attributes: ['username']
+                  }
+                }
+              ]
         });
-        const posts = postdata.map(post => post.get({ plain: true }));
-
-        res.render('homepage', { posts });
+        if (postdata){
+        res.status(200).json(postdata)
+    } else {
+        res.status(404).json({ message: 'No post found' });
+    }
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
@@ -46,22 +37,55 @@ router.get('/:id', async (req, res) => {
     try {
         const postdata = await Post.findOne({
             where: { id: req.params.id },
+            attributes: ['id', 'title', 'post_text', 'created_at'],
             include: [
-                {
-                    model: Comments,
-                    attributes: ['id', 'comments_text', 'post_id', 'user_id', 'created_at']
+              {
+                model: User,
+                attributes: ['username']
+              },
+              {
+                model: Comment,
+                attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                include: {
+                  model: User,
+                  attributes: ['username']
                 }
+              }
             ]
         });
 
         if (!postdata) {
             res.status(404).json({ message: 'No post found with this id' });
             return;
+        } else{
+            res.status(200).json(postdata)
         }
 
-        const post = postdata.get({ plain: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
+    }
+});
 
-        res.render('post', { post });
+// Create a new Post
+router.post('/', withAuth, async (req, res) => {
+    try {
+        // Checks usser is logged in
+        if (!req.session.user_id) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+        // Extracting the necessary data from the request body
+        const { title, post_text } = req.body;
+        
+        // Create a new post using the Post model
+        const postdata = await Post.create({
+            post_title: title,
+            post_text: post_text,
+            user_id: req.session.user_id
+        });
+
+        // Respond with the created post data
+        return res.status(200).json(postdata);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);

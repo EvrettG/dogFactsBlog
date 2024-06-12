@@ -14,27 +14,22 @@
         <nav>
           <a href="/">Home</a>
           <a href="/dashboard">Dashboard</a>
-          {{!-- {{#if loggedIn}}
+          {{#if loggedIn}}
           <a href="/" id="logout">Logout</a>
           {{else}}
           <a href="/login">Login</a>
-          {{/if}} --}}
+          {{/if}}
         </nav>
       </div>
             <div>
         <h1 class="title">Dog Facts Blog</h1>
       </div>
     </header>
-
-    {{!-- {{#each posts}}
-        <div>
-            <h2>{{post_title}}</h2>
-            <p>{{post_text}}</p>
-            <p><small>Posted on: {{post_date}}</small></p>
-        </div>
-    {{/each}} --}}
-    {{!-- {{#if loggedIn}}
+    <main>
+      {{{ body }}}
+    </main>
+    {{#if loggedIn}}
   <script src="/javascript/logout.js"></script>
-  {{/if}} --}}
+  {{/if}}
 </body>
 </html>

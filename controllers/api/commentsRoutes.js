@@ -3,16 +3,13 @@ const withAuth = require('../../utils/auth');
 const { Comments } = require('../../models');
 
 
-// Note: Get all comment performed in post singular get, Revist if necessary
-// Get all comments and render homepage
+// Note: Get all comment performed in post singular get
 router.get('/', async (req, res) => {
     try {
         const commentsdata = await Comments.findAll({
             order: [['created_at', 'DESC']]
         });
-        const comments = commentsdata.map(comments => comments.get({ plain: true }));
-
-        res.json(comments);
+        res.json(commentsdata);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
@@ -22,57 +19,52 @@ router.get('/', async (req, res) => {
 // Create a new Comment
 router.post('/', withAuth, async (req, res) => {
     try {
-        // Checks usser is logged in
-        if (!req.session.user_id) {
-            return res.status(401).json({ message: 'User not authenticated' });
-        }
-        // Extracting the necessary data from the request body
-        const { post_id, comments_text, created_at } = req.body;
-        
         // Create a new post using the Post model
         const commentdata = await Comments.create({
-            post_id: post_id,
-            comments_text: comments_text,
+            comments_text: req.body.comments_text,
+            post_id: req.body.post_id,
             user_id: req.session.user_id
         });
-
-        // Respond with the created post data
         return res.status(200).json(commentdata);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
     }
 });
-
+// TODO later Time issue
 // Update a comments's text by ID
-router.put('/:id', withAuth, async (req, res) => {
-    try {
-        const comments = await Comments.findByPk(req.params.id);
+// router.put('/:id', withAuth, async (req, res) => {
+//     try {
+//         const comments = await Comments.findByPk(req.params.id);
         
-        if (!comments) {
-            return res.status(404).json({ message: 'No comments found with this id' });
-        }
+//         if (!comments) {
+//             return res.status(404).json({ message: 'No comments found with this id' });
+//         }
 
-        const updatedcomment = await comments.update({
-            comments_text: req.body.comments_text
-        });
+//         const updatedcomment = await comments.update({
+//             comments_text: req.body.comments_text
+//         });
 
-        res.status(200).json(updatedcomment);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
-});
+//         res.status(200).json(updatedcomment);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json(err);
+//     }
+// });
 
 // Delete a comment by ID
 router.delete('/:id',withAuth, async (req, res) => {
     try {
-        const comment = await Comments.findByPk(req.params.id);
-        if (!comment) {
-            return res.status(404).json({ message: 'No comment found with this id' });
-        }
-        await comment.destroy();
-        res.status(200).json({ message: 'comment deleted successfully' });
+        const dbCommentData = await Comments.fdestroy({
+            where: {
+              id: req.params.id
+            }
+          })
+          if (!dbCommentData) {
+            res.status(404).json({ message: 'No comment found with this id' });
+            return;
+          }
+          res.json(dbCommentData);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
