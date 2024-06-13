@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dog Facts Blog</title>
-    <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <div class="wrapper">
@@ -21,15 +21,16 @@
           {{/if}}
         </nav>
       </div>
-            <div>
-        <h1 class="title">Dog Facts Blog</h1>
+      <div>
+        <h1 class="homeTitle">Dog Facts Blog</h1>
       </div>
     </header>
     <main>
+    <footer>Thanks for visiting!</footer>
       {{{ body }}}
     </main>
     {{#if loggedIn}}
-  <script src="/javascript/logout.js"></script>
+  <script src="/js/logout.js"></script>
   {{/if}}
 </body>
 </html>

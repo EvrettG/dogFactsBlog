@@ -13,8 +13,8 @@ router.get('/', async (req, res) => {
                   attributes: ['username']
                 },
                 {
-                  model: Comment,
-                  attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                  model: Comments,
+                  attributes: ['id', 'comments_content', 'post_id', 'user_id', 'created_at'],
                   include: {
                     model: User,
                     attributes: ['username']
@@ -44,8 +44,8 @@ router.get('/:id', async (req, res) => {
                 attributes: ['username']
               },
               {
-                model: Comment,
-                attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                model: Comments,
+                attributes: ['id', 'comments_content', 'post_id', 'user_id', 'created_at'],
                 include: {
                   model: User,
                   attributes: ['username']
@@ -69,43 +69,41 @@ router.get('/:id', async (req, res) => {
 
 // Create a new Post
 router.post('/', withAuth, async (req, res) => {
-    try {
-        // Checks usser is logged in
-        if (!req.session.user_id) {
-            return res.status(401).json({ message: 'User not authenticated' });
-        }
-        // Extracting the necessary data from the request body
-        const { title, post_text } = req.body;
-        
-        // Create a new post using the Post model
-        const postdata = await Post.create({
-            post_title: title,
-            post_text: post_text,
-            user_id: req.session.user_id
-        });
+  try {
+    // Create a new post using the Post model
+    const postdata = await Post.create({
+      post_title: req.body.post_title,
+      post_text: req.body.post_text,
+      user_id: req.session.user_id
+    });
 
-        // Respond with the created post data
-        return res.status(200).json(postdata);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
+    // Respond with the created post data
+    return res.status(200).json(postdata);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
 });
 
 // Update a Post's text by ID
 router.put('/:id', withAuth, async (req, res) => {
     try {
-        const post = await Post.findByPk(req.params.id);
-        
-        if (!post) {
-            return res.status(404).json({ message: 'No post found with this id' });
+        const post = await Post.update(
+            {
+                post_title: req.body.post_title,
+                post_text: req.body.post_text
+            },
+            {
+              where: {
+                id: req.params.id
+              }
+            }
+          )
+        if (!post){
+            res.status(404).json({ message: 'No post found with this id' });
+        return;
         }
-
-        const updatedPost = await post.update({
-            post_text: req.body.post_text
-        });
-
-        res.status(200).json(updatedPost);
+        res.status(200).json(post);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
@@ -115,11 +113,14 @@ router.put('/:id', withAuth, async (req, res) => {
 // Delete a Post by ID
 router.delete('/:id',withAuth, async (req, res) => {
     try {
-        const post = await Post.findByPk(req.params.id);
+        const post = await Post.destroy({
+            where: {
+              id: req.params.id
+            }
+          })
         if (!post) {
             return res.status(404).json({ message: 'No post found with this id' });
         }
-        await post.destroy();
         res.status(200).json({ message: 'Post deleted successfully' });
     } catch (err) {
         console.error(err);

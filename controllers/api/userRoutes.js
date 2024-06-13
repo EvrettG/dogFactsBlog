@@ -24,11 +24,11 @@ router.get('/:id', async (req, res) => {
       include: [
         {
           model: Post,
-          attributes: ['id', 'title', 'post_text', 'created_at']
+          attributes: ['id', 'post_title', 'post_text', 'created_at']
         },
         {
           model: Comments,
-          attributes: ['id', 'comment_text', 'created_at']
+          attributes: ['id', 'comments_content', 'created_at']
         }
       ]
     });
@@ -49,16 +49,12 @@ router.post('/', async (req, res) => {
     if(!req.body.username){
       return res.status(400).json({ message: 'User name is required' });
     }
-    if (!req.body.email){
-      return res.status(400).json({ message: 'email is required' });
-    }
     if (!req.body.password || !req.body.password.length >= 6){
       return res.status(400).json({ message: 'Password is not valid' });
     }
     try {
       const dbUserData = await User.create({
         username: req.body.username,
-        email: req.body.email,
         password: req.body.password,
       });
   
@@ -82,25 +78,33 @@ router.post('/login', async (req, res) => {
       where: {
         username: req.body.username
       }
-    })
-    //verify user
-    if(!dbUserData) {
-      res.status(400).json({ message: 'Username not Found' });
-      return;
+    });
+
+    // Verify if the user exists
+    if (!dbUserData) {
+      return res.status(400).json({ message: 'Username not found' });
     }
+
+    // Log passwords for debugging after ensuring dbUserData exists
+    console.log('Input password:', req.body.password);
+    console.log('Stored hashed password:', dbUserData.password);
+
+    // Verify password
     const validPassword = dbUserData.checkPassword(req.body.password);
     if (!validPassword) {
-      res.status(400).json({ message: 'Incorrect Password' });
-      return;
+      return res.status(400).json({ message: 'Incorrect Password' });
     }
+
+    // Save session and send response
     req.session.save(() => {
       req.session.user_id = dbUserData.id;
       req.session.username = dbUserData.username;
       req.session.loggedIn = true;
-      res.json({user: dbUserData, message: 'You are now logged in!' });
+      res.json({ user: dbUserData, message: 'You are now logged in!' });
     });
   } catch (error) {
-    res.status(500).json(err);
+    console.error(error); // Ensure the error is logged for debugging
+    res.status(500).json(error); // Use the same variable name
   }
 });
 

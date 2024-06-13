@@ -3,38 +3,38 @@ const { User, Post, Comments } = require('../models');
 const withAuth = require('../utils/auth');
 
 // get all posts for 1 user in the dashboard
-router.get('/',withAuth, async  (req, res) => {
+router.get('/', withAuth, async (req, res) => {
   try {
-      const postdata = await Post.findAll({
-          where: {
-              user_id: req.session.user_id
-            },
-            attributes: ['id', 'post_title', 'post_text', 'created_at'],
-            order: [['created_at', 'DESC']],
-            include: [
-              {
-                model: User,
-                attributes: ['username']
-              },
-              {
-                model: Comments,
-                attributes: ['id', 'comments_content', 'post_id', 'user_id', 'created_at'],
-                include: {
-                  model: User,
-                  attributes: ['username']
-                }
-              }
-            ]
-          });
-      const posts = postdata.map(post => post.get({ plain: true }));
-      res.render('dashboard', { posts, loggedIn: true });
+    const postData = await Post.findAll({
+      where: {
+        user_id: req.session.user_id
+      },
+      attributes: ['id', 'post_title', 'post_text', 'created_at'],
+      order: [['created_at', 'DESC']],
+      include: [
+        {
+          model: User,
+          attributes: ['username']
+        },
+        {
+          model: Comments,
+          attributes: ['id', 'comments_content', 'post_id', 'user_id', 'created_at'],
+          include: {
+            model: User,
+            attributes: ['username']
+          }
+        }
+      ]
+    });
+    const posts = postData.map(post => post.get({ plain: true }));
+    res.render('dashboard', { posts, loggedIn: true });
   } catch (error) {
-      console.log(err);
-    res.status(500).json(err);
+    console.log(error);
+    res.status(500).json(error);
   }
 });
 
-//get a single post
+// get a single post
 router.get('/edit/:id', withAuth, async (req, res) => {
   try {
     const postData = await Post.findOne({
@@ -43,7 +43,7 @@ router.get('/edit/:id', withAuth, async (req, res) => {
       },
       attributes: [
         'id',
-        'title',
+        'post_title',
         'post_text',
         'created_at'
       ],
@@ -68,24 +68,23 @@ router.get('/edit/:id', withAuth, async (req, res) => {
         }
       ]
     });
-    if (!postData){
+    if (!postData) {
       res.status(404).json({ message: 'No Post found with this id' });
       return;
     }
     const post = postData.get({ plain: true });
     res.render('editPost', {
-      post, 
+      post,
       loggedIn: req.session.loggedIn
     });
   } catch (error) {
-    res.status(500).json(err);
+    res.status(500).json(error);
   }
 });
 
 // Takes user to the newPost.handlebars page /loads the newPost file
-router.get('/new', (req, res) => {
+router.get('/new', withAuth, (req, res) => {
   res.render('newPost');
 });
-  
-  
-  module.exports = router;
+
+module.exports = router;
