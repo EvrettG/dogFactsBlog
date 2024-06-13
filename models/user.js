@@ -1,15 +1,14 @@
-// Here is where we set up the User model, for when we are ready to connect to a database in future activities.
-
 const { Model, DataTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const sequelize = require('../config/connection');
 
 class User extends Model {
-    checkPassword(loginPw) {
-        return bcrypt.compareSync(loginPw, this.password);
-    }
+  //set up method to check password
+  checkPassword(loginPw) {
+    return bcrypt.compareSync(loginPw, this.password);
+  }
 }
-// set's table to include id, Username, User password and user email
+
 User.init(
     {
         id: {
@@ -23,33 +22,34 @@ User.init(
             allowNull: false,
             unique: true,
         },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true,
-            },
-        },
+        // email: {
+        //     type: DataTypes.STRING,
+        //     allowNull: false,
+        //     unique: true,
+        //     validate: {
+        //         isEmail: true,
+        //     },
+        // },
         password: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                len: [6],
+                len: [6], // Enforces a minimum length of 6 characters for the password
             },
         },
     },
     {
-	// Used to encrpt password before storage into database
         hooks: {
             async beforeCreate(newUserData) {
                 newUserData.password = await bcrypt.hash(newUserData.password, 10);
                 return newUserData;
-            },
+              },
             async beforeUpdate(updatedUserData) {
-                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                if (updatedUserData.password) {
+                    updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                }
                 return updatedUserData;
-              }
+            }
         },
         sequelize,
         freezeTableName: true,
