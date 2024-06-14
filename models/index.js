@@ -24,7 +24,6 @@ foreignKey: 'user_id'
 
 Post.hasMany(Comments, {
 foreignKey: 'post_id',
-onDelete: 'CASCADE'
 });
 
 module.exports = {User, Comments, Post}

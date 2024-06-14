@@ -81,7 +81,9 @@ try {
     res.status(404).json({ message: 'No Post found with this id' });
     return;
   }
+  // console.log(postData)
   const post = postData.get({ plain: true });
+  console.log(post)
   res.render('singlePost', {
     post, 
     loggedIn: req.session.loggedIn
